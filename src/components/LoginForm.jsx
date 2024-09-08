@@ -23,6 +23,9 @@ const LoginForm = ({ setUser }) => {
       if (data.length > 0) {
         // Guarda el nombre y el email en el estado
         setUser({ name: data[0].name, email: data[0].email })
+
+        localStorage.setItem('userInfo', JSON.stringify({ name: data[0].name, email: data[0].email }));
+
       } else {
         setError("El correo o la contraseña ingresados no se encuentran registrados")
       }
