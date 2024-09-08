@@ -1,44 +1,56 @@
-import React from 'react'
+import React, { useState } from 'react'
 import "./LoginForm.css"
-import { useState } from 'react'
 
-const LoginForm = ({setUser}) => {
-  const [username, setUsername] = useState("")
+const LoginForm = ({ setUser }) => {
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (username === "" || password === "") {
-      setError(true)
+    if (email === "" || password === "") {
+      setError("Todos los campos son obligatorios")
       return
     }
-    setError(false)
 
-    setUser([username])
+    setError("")
+
+    try {
+      const response = await fetch(`http://localhost:5000/users?email=${email}&password=${password}`)
+      const data = await response.json()
+
+      if (data.length > 0) {
+        // Guarda el nombre y el email en el estado
+        setUser({ name: data[0].name, email: data[0].email })
+      } else {
+        setError("El correo o la contraseña ingresados no se encuentran registrados")
+      }
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error)
+      setError("Ocurrió un error al intentar iniciar sesión. Por favor, intenta de nuevo")
+    }
   }
+
   return (
     <section>
       <h1>Login</h1>
-
       <form className='form' onSubmit={handleSubmit}>
-        <h3>Usuario</h3>
         <input
-          type="text"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
+          type="email"
+          value={email}
+          placeholder='Correo'
+          onChange={e => setEmail(e.target.value)}
         />
-
-        <h3>Contraseña</h3>
         <input
           type="password"
           value={password}
+          placeholder='Constraseña'
           onChange={e => setPassword(e.target.value)}
         />
         <button>Iniciar Sesión</button>
       </form>
-      {error && <p>Todos los campos son obligatorios</p>}
+      {error && <p>{error}</p>}
     </section>
   )
 }
