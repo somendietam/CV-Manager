@@ -25,6 +25,15 @@ const LoginForm = ({ setUser }) => {
         setUser({ name: data[0].name, email: data[0].email })
 
         localStorage.setItem('userInfo', JSON.stringify({ name: data[0].name, email: data[0].email }));
+        
+        const sendMessageToContentScript = (userInfo) => {
+          window.postMessage({ type: 'FROM_PAGE', userInfo }, '*');
+      };
+      
+      if (window.chrome) {
+          sendMessageToContentScript({ name: data[0].name, email: data[0].email });
+      }
+        
 
       } else {
         setError("El correo o la contraseña ingresados no se encuentran registrados")
